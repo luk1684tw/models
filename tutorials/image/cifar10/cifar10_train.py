@@ -45,12 +45,12 @@ import cifar10
 
 FLAGS = tf.app.flags.FLAGS
 
-tf.app.flags.DEFINE_string('train_dir', '/tmp/cifar10_train',
+tf.app.flags.DEFINE_string('train_dir', './tmp/cifar10_train',
                            """Directory where to write event logs """
                            """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 1000000,
+tf.app.flags.DEFINE_integer('max_steps', 10000,
                             """Number of batches to run.""")
-tf.app.flags.DEFINE_boolean('log_device_placement', False,
+tf.app.flags.DEFINE_boolean('log_device_placement', True,
                             """Whether to log device placement.""")
 tf.app.flags.DEFINE_integer('log_frequency', 10,
                             """How often to log results to the console.""")
@@ -59,6 +59,7 @@ tf.app.flags.DEFINE_integer('log_frequency', 10,
 def train():
   """Train CIFAR-10 for a number of steps."""
   with tf.Graph().as_default():
+    
     global_step = tf.train.get_or_create_global_step()
 
     # Get images and labels for CIFAR-10.
@@ -85,7 +86,7 @@ def train():
         self._step = -1
         self._start_time = time.time()
 
-      def before_run(self, run_context):
+      def before_run(self, run_corntext):
         self._step += 1
         return tf.train.SessionRunArgs(loss)  # Asks for loss value.
 
@@ -111,6 +112,7 @@ def train():
                _LoggerHook()],
         config=tf.ConfigProto(
             log_device_placement=FLAGS.log_device_placement)) as mon_sess:
+      fileWriter = tf.summary.FileWriter("logs/", mon_sess.graph)
       while not mon_sess.should_stop():
         mon_sess.run(train_op)
 
